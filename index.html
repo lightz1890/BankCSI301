@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ethereum Voting DApp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Ethereum Voting DApp</h1>
+        <div class="mb-3">
+            <label for="contractAddress" class="form-label">Smart Contract Address:</label>
+            <input type="text" class="form-control" id="contractAddress" placeholder="Enter contract address">
+            <button id="connectBtn" class="btn btn-primary mt-2">Connect to MetaMask</button>
+        </div>
+        <div id="status" class="mb-3"></div>
+        <div class="mb-3 d-flex flex-wrap gap-2">
+            <button class="btn btn-secondary" id="checkStatus">Status</button>
+            <button class="btn btn-warning" id="checkBallot">Ballot</button>
+            <button class="btn btn-info" id="checkScores">Score</button>
+            <button class="btn btn-success" id="openVote">Open</button>
+            <button class="btn btn-danger" id="closeVote">Close</button>
+        </div>
+        <div id="voteOptions" class="d-flex flex-wrap gap-2 mb-4"></div>
+        <div id="output" class="alert alert-light"></div>
+        <div>
+            <h5>Vote Scores:</h5>
+            <ul id="scoreList" class="list-group"></ul>
+            <canvas id="scoreChart" class="mt-4"></canvas>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
