@@ -1,0 +1,28 @@
+/* style.css */
+
+body {
+      background-color: #f8f9fa;
+  }
+  
+  h1 {
+      font-weight: bold;
+  }
+  
+  #voteOptions button {
+      min-width: 100px;
+  }
+  
+  #status {
+      font-weight: bold;
+      color: green;
+  }
+  
+  #myBallot {
+      font-size: 1.1rem;
+      font-weight: 500;
+  }
+  
+  .list-group-item {
+      font-size: 1rem;
+  }
+  
