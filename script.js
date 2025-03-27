@@ -4,10 +4,6 @@ let web3;
 let contract;
 let account;
 
-//const INFURA_URL = "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"; // <-- ใส่ค่า PROJECT_ID ของคุณ
-//const PRIVATE_KEY = "YOUR_PRIVATE_KEY"; // <-- ใส่ Private Key ของคุณ
-const INFURA_URL = "https://holesky.infura.io/v3/1321eaaa9e1b48a1b6bff4b68c49e27d"; // <-- ใส่ค่า PROJECT_ID ของคุณ
-const PRIVATE_KEY = "4689bfe942dddc51b5c29ffe38aa99d1434e33076349f840ab099adc32f30edb"; // <-- ใส่ Private Key ของคุณ
 const abi = [
     { "inputs": [], "name": "status", "outputs": [{ "internalType": "bool", "name": "open_", "type": "bool" }], "stateMutability": "view", "type": "function" },
     { "inputs": [], "name": "scores", "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }], "stateMutability": "view", "type": "function" },
@@ -17,33 +13,31 @@ const abi = [
     { "inputs": [], "name": "close", "outputs": [], "stateMutability": "nonpayable", "type": "function" }
 ];
 
-const maxOption = 5; // ปรับตาม contract ของคุณ
+const maxOption = 5; // Adjust based on your contract deployment _max
 
 function logOutput(text) {
     document.getElementById('output').textContent = text;
 }
 
 document.getElementById('connectBtn').addEventListener('click', async () => {
-    const contractAddress = document.getElementById('contractAddress').value.trim();
-    if (!contractAddress) {
-        alert('Please enter the contract address');
-        return;
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        //web3 = new Web3( new Web3.providers.HttpProvider( "https://kovan.infura.io/v3/YOUR_INFURA_KEY" ));
+        await window.ethereum.enable();
+        const accounts = await web3.eth.getAccounts();
+        account = accounts[0];
+
+        //const contractAddress = 0xcE8057ea5f7fe80cA556Dbff29fa87f9f6fccAA1;
+        const contractAddress = document.getElementById('contractAddress').value.trim();
+        contract = new web3.eth.Contract(abi, contractAddress);
+
+        document.getElementById('status').textContent = `Connected: ${account}`;
+
+        renderVoteButtons();
+        showScores();
+    } else {
+        alert('Please install MetaMask');
     }
-
-    // เชื่อมต่อกับ Infura
-    web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
-
-    // สร้าง instance ของสัญญา
-    contract = new web3.eth.Contract(abi, contractAddress);
-
-    // ตรวจสอบว่า Private Key ถูกต้องและสามารถดึง account มาได้หรือไม่
-    account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY);
-    web3.eth.accounts.wallet.add(account);
-    document.getElementById('status').textContent = `Connected via Infura with account: ${account.address}`;
-
-    // เรียกฟังก์ชันแสดงปุ่มโหวตและคะแนน
-    renderVoteButtons();
-    showScores();
 });
 
 function renderVoteButtons() {
@@ -60,24 +54,8 @@ function renderVoteButtons() {
 
 async function vote(option) {
     try {
-        const tx = contract.methods.vote(option);
-        const gas = await tx.estimateGas({ from: account.address });
-        const gasPrice = await web3.eth.getGasPrice();
-        const data = tx.encodeABI();
-
-        const txData = {
-            from: account.address,
-            to: contract.options.address,
-            data: data,
-            gas: gas,
-            gasPrice: gasPrice,
-        };
-
-        // เซ็นธุรกรรมด้วย Private Key
-        const signedTx = await web3.eth.accounts.signTransaction(txData, PRIVATE_KEY);
-        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-
-        logOutput(`You voted for option ${option}. Transaction hash: ${receipt.transactionHash}`);
+        await contract.methods.vote(option).send({ from: account });
+        logOutput(`You voted for option ${option}`);
         showScores();
     } catch (err) {
         logOutput(`Error: ${err.message}`);
@@ -86,7 +64,7 @@ async function vote(option) {
 
 document.getElementById('checkBallot').addEventListener('click', async () => {
     try {
-        const option = await contract.methods.ballots().call();
+        const option = await contract.methods.ballots().call({ from: account });
         logOutput(`You voted for option: ${option}`);
     } catch (err) {
         logOutput(`Error: ${err.message}`);
@@ -159,4 +137,24 @@ document.getElementById('checkStatus').addEventListener('click', async () => {
         const isOpen = await contract.methods.status().call();
         logOutput(`Election is currently ${isOpen ? 'OPEN' : 'CLOSED'}`);
     } catch (err) {
-        logOutput(`Error: ${
+        logOutput(`Error: ${err.message}`);
+    }
+});
+
+document.getElementById('openVote').addEventListener('click', async () => {
+    try {
+        await contract.methods.open().send({ from: account });
+        logOutput('Election opened');
+    } catch (err) {
+        logOutput(`Error: ${err.message}`);
+    }
+});
+
+document.getElementById('closeVote').addEventListener('click', async () => {
+    try {
+        await contract.methods.close().send({ from: account });
+        logOutput('Election closed');
+    } catch (err) {
+        logOutput(`Error: ${err.message}`);
+    }
+});
