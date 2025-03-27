@@ -9,41 +9,27 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center mb-4">Ethereum Voting DApp</h1>
-        
-        <!-- ส่วนที่ให้กรอก contract address และปุ่มเชื่อมต่อ -->
         <div class="mb-3">
             <label for="contractAddress" class="form-label">Smart Contract Address:</label>
             <input type="text" class="form-control" id="contractAddress" placeholder="Enter contract address">
-            <button id="connectBtn" class="btn btn-primary mt-2">Connect to MetaMask / Infura</button>
+            <button id="connectBtn" class="btn btn-primary mt-2">Connect to MetaMask</button>
         </div>
-
-        <!-- ส่วนแสดงสถานะการเชื่อมต่อ -->
         <div id="status" class="mb-3"></div>
-        
-        <!-- ปุ่มสำหรับการเช็คข้อมูลต่าง ๆ -->
         <div class="mb-3 d-flex flex-wrap gap-2">
-            <button class="btn btn-secondary" id="checkStatus">Check Status</button>
-            <button class="btn btn-warning" id="checkBallot">Check Ballot</button>
-            <button class="btn btn-info" id="checkScores">Check Scores</button>
-            <button class="btn btn-success" id="openVote">Open Vote</button>
-            <button class="btn btn-danger" id="closeVote">Close Vote</button>
+            <button class="btn btn-secondary" id="checkStatus">Status</button>
+            <button class="btn btn-warning" id="checkBallot">Ballot</button>
+            <button class="btn btn-info" id="checkScores">Score</button>
+            <button class="btn btn-success" id="openVote">Open</button>
+            <button class="btn btn-danger" id="closeVote">Close</button>
         </div>
-
-        <!-- ส่วนแสดงตัวเลือกสำหรับการโหวต -->
         <div id="voteOptions" class="d-flex flex-wrap gap-2 mb-4"></div>
-
-        <!-- ส่วนแสดงผลลัพธ์ต่าง ๆ -->
         <div id="output" class="alert alert-light"></div>
-
-        <!-- ส่วนแสดงคะแนน -->
         <div>
             <h5>Vote Scores:</h5>
             <ul id="scoreList" class="list-group"></ul>
             <canvas id="scoreChart" class="mt-4"></canvas>
         </div>
     </div>
-
-    <!-- รวม JS Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="script.js"></script>
