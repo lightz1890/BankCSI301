@@ -4,10 +4,8 @@ let web3;
 let contract;
 let account;
 
-//const INFURA_URL = "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"; // <-- ใส่ค่า PROJECT_ID ของคุณ
-//const PRIVATE_KEY = "YOUR_PRIVATE_KEY"; // <-- ใส่ Private Key ของคุณ
-const INFURA_URL = "https://holesky.infura.io/v3/1321eaaa9e1b48a1b6bff4b68c49e27d"; // <-- ใส่ค่า PROJECT_ID ของคุณ
-const PRIVATE_KEY = "4689bfe942dddc51b5c29ffe38aa99d1434e33076349f840ab099adc32f30edb"; // <-- ใส่ Private Key ของคุณ
+const INFURA_URL = "https://sepolia.infura.io/v3/YOUR_INFURA_PROJECT_ID"; // <-- ใส่ค่า PROJECT_ID ของคุณ
+const PRIVATE_KEY = "YOUR_PRIVATE_KEY"; // <-- ใส่ Private Key ของคุณ
 const abi = [
     { "inputs": [], "name": "status", "outputs": [{ "internalType": "bool", "name": "open_", "type": "bool" }], "stateMutability": "view", "type": "function" },
     { "inputs": [], "name": "scores", "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }], "stateMutability": "view", "type": "function" },
@@ -30,20 +28,26 @@ document.getElementById('connectBtn').addEventListener('click', async () => {
         return;
     }
 
-    // เชื่อมต่อกับ Infura
-    web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
+    try {
+        // เชื่อมต่อกับ Infura
+        web3 = new Web3(new Web3.providers.HttpProvider(INFURA_URL));
+        
+        // สร้าง instance ของสัญญา
+        contract = new web3.eth.Contract(abi, contractAddress);
 
-    // สร้าง instance ของสัญญา
-    contract = new web3.eth.Contract(abi, contractAddress);
-
-    // ตรวจสอบว่า Private Key ถูกต้องและสามารถดึง account มาได้หรือไม่
-    account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY);
-    web3.eth.accounts.wallet.add(account);
-    document.getElementById('status').textContent = `Connected via Infura with account: ${account.address}`;
-
-    // เรียกฟังก์ชันแสดงปุ่มโหวตและคะแนน
-    renderVoteButtons();
-    showScores();
+        // ตรวจสอบว่า Private Key ถูกต้องและสามารถดึง account มาได้หรือไม่
+        account = web3.eth.accounts.privateKeyToAccount(PRIVATE_KEY);
+        web3.eth.accounts.wallet.add(account);
+        document.getElementById('status').textContent = `Connected via Infura with account: ${account.address}`;
+        
+        // เรียกฟังก์ชันแสดงปุ่มโหวตและคะแนน
+        renderVoteButtons();
+        showScores();
+    } catch (err) {
+        console.error("Error connecting to Infura:", err);
+        document.getElementById('status').textContent = "Error: Unable to connect to Infura. Please check your network or Infura URL.";
+        logOutput(`Error: Unable to connect to Infura: ${err.message}`);
+    }
 });
 
 function renderVoteButtons() {
@@ -159,4 +163,56 @@ document.getElementById('checkStatus').addEventListener('click', async () => {
         const isOpen = await contract.methods.status().call();
         logOutput(`Election is currently ${isOpen ? 'OPEN' : 'CLOSED'}`);
     } catch (err) {
-        logOutput(`Error: ${
+        logOutput(`Error: ${err.message}`);
+    }
+});
+
+document.getElementById('openVote').addEventListener('click', async () => {
+    try {
+        const tx = contract.methods.open();
+        const gas = await tx.estimateGas({ from: account.address });
+        const gasPrice = await web3.eth.getGasPrice();
+        const data = tx.encodeABI();
+
+        const txData = {
+            from: account.address,
+            to: contract.options.address,
+            data: data,
+            gas: gas,
+            gasPrice: gasPrice,
+        };
+
+        // เซ็นธุรกรรมด้วย Private Key
+        const signedTx = await web3.eth.accounts.signTransaction(txData, PRIVATE_KEY);
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+        logOutput('Election opened. Transaction hash: ' + receipt.transactionHash);
+    } catch (err) {
+        logOutput(`Error: ${err.message}`);
+    }
+});
+
+document.getElementById('closeVote').addEventListener('click', async () => {
+    try {
+        const tx = contract.methods.close();
+        const gas = await tx.estimateGas({ from: account.address });
+        const gasPrice = await web3.eth.getGasPrice();
+        const data = tx.encodeABI();
+
+        const txData = {
+            from: account.address,
+            to: contract.options.address,
+            data: data,
+            gas: gas,
+            gasPrice: gasPrice,
+        };
+
+        // เซ็นธุรกรรมด้วย Private Key
+        const signedTx = await web3.eth.accounts.signTransaction(txData, PRIVATE_KEY);
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+        logOutput('Election closed. Transaction hash: ' + receipt.transactionHash);
+    } catch (err) {
+        logOutput(`Error: ${err.message}`);
+    }
+});
