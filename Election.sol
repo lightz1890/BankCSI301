@@ -4,8 +4,8 @@ pragma solidity ^0.8.0;
 contract Bank {
     mapping(address => uint) _balances;
 
-    string public studentName = "Pichayapa Boonthanom";
-    string public studentID = "65073814";
+    string public studentName = "Kittipat Pramjit";
+    string public studentID = "65054917";
 
     event Deposit(address indexed owner, uint amount);
     event Withdraw(address indexed owner, uint amount);

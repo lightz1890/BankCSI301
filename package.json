@@ -12,13 +12,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BitterSweet7/DApp-Smart-Contract.git"
+    "url": "git+https://github.com/lightz1890/BankCSI301.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/BitterSweet7/DApp-Smart-Contract/issues"
+    "url": "https://github.com/lightz1890/BankCSI301/issues"
   },
-  "homepage": "https://github.com/BitterSweet7/DApp-Smart-Contract#readme"
+  "homepage": "https://github.com/lightz1890/BankCSI301#readme"
 }
